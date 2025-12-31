@@ -1,0 +1,17 @@
+{
+    // Jupyter Notebook specific
+    "notebook.output.wordWrap": true,
+    "notebook.output.textLineLimit": 150,
+    "notebook.lineNumbers": "on",
+    
+    // General editor settings that help
+    "editor.wordWrap": "on",
+    "editor.wordWrapColumn": 150,
+    
+    // Python/Jupyter extensions
+    "python.analysis.autoFormatStrings": true,
+    "jupyter.widgetScriptSources": [
+        "jsdelivr.com",
+        "unpkg.com"
+    ]
+}
