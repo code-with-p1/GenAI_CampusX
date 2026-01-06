@@ -21,27 +21,27 @@ llm = HuggingFaceEndpoint(
 model = ChatHuggingFace(llm=llm)
 
 # 1st prompt -> detailed report
-template1 = PromptTemplate(
+report_template = PromptTemplate(
     template='Write a detailed report on {topic}',
     input_variables=['topic']
 )
 
 # 2nd prompt -> summary
-template2 = PromptTemplate(
+summary_template = PromptTemplate(
     template='Write a 5 line summary on the following text. /n {text}',
     input_variables=['text']
 )
 
-prompt1 = template1.invoke({'topic':'black hole'})
+report_prompt = report_template.invoke({'topic':'black hole'})
 
-result = model.invoke(prompt1)
+report_result = model.invoke(report_prompt)
 
-print("Detailed Report : ", result.content)
+print("Detailed Report : ", report_result.content)
 
-prompt2 = template2.invoke({'text':result.content})
+summary_prompt = summary_template.invoke({'text':report_result.content})
 
-result1 = model.invoke(prompt2)
+summary_result = model.invoke(summary_prompt)
 
 print("\n\n")
 
-print("Summary : ", result1.content)
+print("Summary : ", summary_result.content)
