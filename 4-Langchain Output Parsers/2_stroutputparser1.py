@@ -18,16 +18,16 @@ llm = HuggingFaceEndpoint(
     temperature=0.1,
     max_new_tokens=512,
 )
-model = ChatHuggingFace(llm=llm)
+hf_model = ChatHuggingFace(llm=llm)
 
 # 1st prompt -> detailed report
-template1 = PromptTemplate(
+report_prompt_template = PromptTemplate(
     template='Write a detailed report on {topic}',
     input_variables=['topic']
 )
 
 # 2nd prompt -> summary with TWO input variables
-template2 = PromptTemplate(
+summary_prompt_template = PromptTemplate(
     template="""Write a {style} summary of the following text.
     - Maximum length: {max_words} words
     - Tone: {tone}
@@ -36,10 +36,10 @@ template2 = PromptTemplate(
     input_variables=['style', 'max_words', 'tone', 'language', 'text']
 )
 
-parser = StrOutputParser()
+common_output_parser = StrOutputParser()
 
 # The chain now passes the output of the first model call as 'text' to the second prompt
-chain = template1 | model | parser | template2 | model | parser
+chain = report_prompt_template | hf_model | common_output_parser | summary_prompt_template | hf_model | common_output_parser
 
 result = chain.invoke({
     'topic': 'Black Hole',
