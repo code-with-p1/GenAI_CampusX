@@ -50,3 +50,55 @@ result = chain.invoke({
 })
 
 print(result)
+
+
+# 2nd Option
+from langchain_core.runnables import RunnablePassthrough
+
+new_chain = (
+    report_prompt_template
+    | hf_model
+    | common_output_parser
+    | RunnablePassthrough.assign(text=lambda x: x)
+    | summary_prompt_template
+    | hf_model
+    | common_output_parser
+)
+
+new_result = new_chain.invoke({
+    'topic': 'Black Hole',
+    'style': 'Academic',
+    'max_words': 100,
+    'tone': 'Formal',
+    'language': 'English'
+})
+
+print(new_result)
+
+
+# 3rd Option
+from langchain_core.runnables import RunnablePassthrough
+
+third_chain = (
+    RunnablePassthrough()
+    | {
+        "text": report_prompt_template | hf_model | common_output_parser,
+        "style": lambda x: x["style"],
+        "max_words": lambda x: x["max_words"],
+        "tone": lambda x: x["tone"],
+        "language": lambda x: x["language"],
+    }
+    | summary_prompt_template
+    | hf_model
+    | common_output_parser
+)
+
+third_result = third_chain.invoke({
+    'topic': 'Black Hole',
+    'style': 'Academic',
+    'max_words': 100,
+    'tone': 'Formal',
+    'language': 'English'
+})
+
+print(third_result)
