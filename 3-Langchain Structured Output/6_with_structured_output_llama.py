@@ -14,7 +14,6 @@ model = ChatHuggingFace(llm=llm)
 
 # schema
 class Review(BaseModel):
-
     key_themes: list[str] = Field(description="Write down all the key themes discussed in the review in a list")
     summary: str = Field(description="A brief summary of the review")
     sentiment: Literal["pos", "neg"] = Field(description="Return sentiment of the review either negative, positive or neutral")
