@@ -102,3 +102,75 @@ third_result = third_chain.invoke({
 })
 
 print(third_result)
+
+
+# 4th Option
+from langchain_core.runnables import RunnableLambda, RunnablePassthrough
+from langchain_core.prompts import PromptTemplate
+from langchain_core.output_parsers import StrOutputParser
+
+# First prompt
+report_prompt_template = PromptTemplate(
+    template="Write a detailed report on {topic}",
+    input_variables=["topic"]
+)
+
+# Model output → string
+generate_report_chain = (
+    report_prompt_template
+    | hf_model
+    | StrOutputParser()
+)
+
+# Convert string → dict with multiple values
+first_chain = (
+    generate_report_chain
+    | RunnableLambda(
+        lambda text: {
+            "text": text,
+            "word_count": len(text.split())
+        }
+    )
+)
+
+
+summary_prompt_template = PromptTemplate(
+    template="""
+Write a {style} summary of the following text.
+- Maximum length: {max_words} words
+- Tone: {tone}
+- Language: {language}
+
+Text:
+{text}
+""",
+    input_variables=["style", "max_words", "tone", "language", "text"]
+)
+
+combined_chain = (
+    RunnablePassthrough()
+    | {
+        # output from first chain
+        "text": first_chain | (lambda x: x["text"]),
+        "word_count": first_chain | (lambda x: x["word_count"]),
+
+        # passthrough inputs
+        "style": lambda x: x["style"],
+        "max_words": lambda x: x["max_words"],
+        "tone": lambda x: x["tone"],
+        "language": lambda x: x["language"],
+    }
+    | summary_prompt_template
+    | hf_model
+    | StrOutputParser()
+)
+
+fourth_result = combined_chain.invoke({
+    'topic': 'Black Hole',
+    'style': 'Academic',
+    'max_words': 100,
+    'tone': 'Formal',
+    'language': 'English'
+})
+
+print(fourth_result)
